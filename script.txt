@@ -1,0 +1,909 @@
+Good morning everyone. It's a real honor to be here today, kicking off
+the Eighth European Lisp Symposium.
+
+My name is Zach Beane, and today I'm going to talk about Quicklisp.
+
+I'm going to look back and talk about some of the trends I've seen
+since Quicklisp was first released in 2010.
+
+And I'm going to look ahead to the future of Quicklisp, and what it
+will take to go on beyond "beta".
+
+First of all, can I get a show of hands, who here is a regular user of
+Common Lisp?
+
+Thank you.
+
+Of the Common Lisp users, who here has *never* used Quicklisp?
+
+Ok. Thanks. That's about what I expected.
+
+
+[slide: my perspective]
+
+I'd like to give you an idea about my perspective on the Common Lisp
+world.
+
+I started using Common Lisp seriously in the early 2000s. I was very
+much into free software and open source at the time -- I got started
+that way in the 90s in college, when Linux was just getting popular. I
+tried out some Schemes, first, and used CMUCL for a little while, and
+then settled on SBCL as my primary platform.
+
+It's only been in the past five or six years that I've used and
+appreciated a wider variety Common Lisp implementations. It was easy,
+early on, to think that my familar corner of the Lisp world was the
+entire Common Lisp community, but over time I've learned that there's
+a lot of separate little Common Lisp communities that have sprung up
+around an implementation, or a company, or a particular time and
+place, or other factors.
+
+So keep that in mind: I come from the 2000s, not the 80s or 90s, or
+2010s, and I grew up in Lisp with a Linux-like atmosphere of building
+and sharing libraries, and using mostly open source Common Lisp
+implementations.
+
+These days I really like all Common Lisp implementations, and try to
+follow a lot of different Common Lisp communities, but I still know my
+little community the best.
+
+So that's my perspective for today's talk.
+
+
+[slide:Quicklisp Overview]
+
+Here's a quick overview of Quicklisp. 
+
+It's Lisp program that's easy to install, easy to use, and makes it
+easy to use and update a bunch of Lisp libraries.
+
+[fake slide about curl]
+
+Just kidding!
+
+It's a matter of downloading and loading a single Lisp file into the
+implementation of your choice. That file is an installer, and it
+fetches the rest of the Quicklisp code when you run its install
+command.
+
+[slide: Works Almost Everywhere]
+
+That installer, and the rest of the code it fetches, is highly
+portable. It works on almost all Common Lisp implementations, on
+almost all platforms.
+
+Quicklisp does not assume you have a Unix environment to start from,
+it works all right on Windows, too. It doesn't rely on comand line
+programs, or even the command line itself. Everything is done through
+the REPL.
+
+There are a few Common Lisp implementations that Quicklisp doesn't
+support, like GCL. GCL isn't close enough to ANSI, yet, for me to give
+it a try. And I'm not interested in trying to port it to OpenGenera,
+or anything that requires ugly hacks to work. Of course, ugliness is
+in the eye of the beholder.
+
+[slide: Tested and Updated Monthly]
+
+Quicklisp provides easy access to hundreds of libraries. All the
+libraries are tested together, and once every month, when everything
+is working well, I publish an updated set of libraries.
+
+[slide: Everything Versioned Together]
+
+I've done that for the past 50 months or so, with only one skipped
+month so far.
+
+And after each update of the libraries, there's a simple command in
+the client to drop the previous month's old libraries and get the
+libraries for a new month.
+
+
+[slide: Practical Interface]
+
+Here are a few of the commands that I use in Quicklisp on a regular
+basis.
+
+Quickload loads systems, and fetches any prerequisite libraries
+automatically. And it's not just for things that Quicklisp
+provides. It can load any system visible to ASDF, and I use quickload
+all the time to load my own non-Quicklisp projects.
+
+System-apropos is a crude way to search for systems by name. Mostly
+useful if you already have a good idea of what you want, and you just
+need a reminder of the right system name.
+
+Update-dist is the way to get library updates.
+
+A little tangent. I've had more than one person ask me how to prevent
+quicklisp from updating its libraries. It's simple: if you don't want
+updates, don't use update-dist. Updates don't happen automatically, so
+you don't have to worry about it changing things behind your back.
+
+Update-client is the way to get client updates. The client is the Lisp
+program responsible for fetching library metadata and software
+archives. I update it from time to time when I add new features or fix
+bugs.
+
+[slide: Quicklisp isn't perfect]
+
+I think Quicklisp works pretty well most of the time, but of course it
+isn't perfect. Providing libraries for a programming environment isn't
+always easy or simple.
+
+[slide: Node startup scores $8M]]
+
+Sometimes I'm glad that I don't have to deal with the problems of a
+huge library ecosystem, like node. Like the problem of how to spend $8
+million in venture funding.
+
+[slide: Go: How to deal with dependencies and their versions?]
+
+People are still trying to find the best way to deal with building on
+the work of others.
+
+This slide is from a Go discussion from a month ago:
+
+Question: "How to deal with dependencies?"
+
+Answer: "We've never recommended a particular answer."
+
+I guess that's better than recommending the wrong answer.
+
+I'm not picking on Node or Go. I don't think Quicklisp is doing
+something right that everyone else is doing wrong. But it does make me
+feel better to know that even with a lot of resources, it's not always
+clear how to do the right thing.
+
+Everyone is still figuring it out, and relative obscurity seems to
+give you a lot of latitude.
+
+
+So that's quicklisp, from a practical standpoint.
+
+
+[slide:]
+
+Now I'd like to talk about some history and trends.
+
+
+Quicklisp was released in 2010, just before the International Lisp
+Conference in Reno. 
+
+It built on the tradition of previous tools like asdf-install and
+clbuild, with some differences in design and execution. I think it hit
+a sweet spot in terms of ease of use - just load a single file, run a
+few commands, and you have easy access to hundreds of libraries.
+
+Since the initial release, a lot of things have changed in the
+Quicklisp world and the broader Common Lisp world.
+
+[slide:installs]
+
+Here's a graph of the average installations per day for Quicklisp,
+going back to 2011.
+
+There were around 60 installations per day for 2011. In 2015, that's
+now close to 240 installations per day.
+
+I don't think this is from users downloading the installation file
+and running it manually. Instead, I think this recent surge in usage
+is probably due to people fitting it it into things like continuous
+integration services and build processes, where each run fetches and
+installs its own local copy of Quicklisp, possibly many times per day
+per person.
+
+Even though it I don't think it matches up directly with user growth,
+I'm glad to see people using Quicklisp like this. It means it's
+becoming a useful part of a modern workflow.
+
+[slide:project count]
+
+The first version of Quicklisp in October 2010 had around 300
+projects. The most recent update this month had nearly 1200. People
+are steadily contributing new projects to Quicklisp.
+
+[slide:projects per year]
+
+It's more than ten new projects per month, on average, and the pace
+has been picking up this year.
+
+It's encouraging to me is that it's not just people who learned Lisp
+ten or twenty or thirty years ago contributing new libraries.
+
+There are new people from all over the world who are adding useful
+projects to Quicklisp. Nicolas Hafner, for example, has added thirty
+new, useful libraries over the past few years.
+
+There also seems to be a real boom in the Japanese-speaking Common
+Lisp community, and I see some of the effects with great projects like
+Clack, qlot, fast-http, optima, and many others.
+
+It's hard to understand exactly what's going on because of the
+language barrier, so I'm glad they take the time to produce English
+documentation to reach a wider audience.
+
+I hope to see the trend of new contributors continue.
+
+[slide:top libraries, 2015]
+
+Regarding projects, I've started keeping all project download stats in
+a database for easy analysis and reports. If you read the Quicklisp
+blog or Planet Lisp, you've probably seen that I've been posting the
+top 100 most downloaded projects for the past few months.
+
+The data is pretty raw. It's just a count of how many times each
+project's archive file was fetched. That could be someone downloading
+it directly with quickload, or downloading it as a dependency of some
+other project. Someone could also have a direct link to it and
+download it repeatedly with curl and pump up the stats.
+
+Please don't do that. I don't want to have to write code to work
+around someone gaming the stats.
+
+With that disclaimer, here are the top five downloaded projects for
+March, 2015.
+
+[slide]
+
+Each of these projects was availble in the very first version of
+Quicklisp in 2010. They were pretty old, even in 2010!
+
+[slide]
+
+In fact, of the top 25 projects, about 90% of them were in the first
+version of Quicklisp.
+
+And of the top 100, almost 70% are from that first version.
+
+I think there are a few possible explanations for this. It could be
+that these projects dominate the download counts because these
+projects are so mature and useful that they are part of the dependency
+tree of many other projects.
+
+It also could be a sign of conservatism, where people are more likely
+to trust a familiar name than a similar, more recent project.
+
+It could be that it's hard to discover new, useful projects to try --
+I'm going to talk more about that later.
+
+[slide: planet lisp posts ]
+
+This chart stretches the timeline back ten years.
+
+The point is that as a way to present new libraries, ideas,
+techniques, and tips, blogging is way down for Common Lisp. People
+just aren't writing like they used to.
+
+I know for me personally it's mostly down to free time - I've gotten
+older, I have two kids that weren't around in 2005, and some of the
+time I might have spent writing nerdy stuff for strangers I now spend
+with my family.
+
+There are also more outlets. If I hear about some interesting Lisp
+news, I'm more likely to tweet about it with a lisp hashtag, or post
+it to reddit, than to go to my blog and write a few paragraphs.
+
+On the bright side, other people sharing interesting Lisp stuff on
+twitter, too. You can check the #lisp hashtag on twitter and usually
+see some interesting, and sometimes weird, stuff every day, and reddit
+often has interesting stories about Lisp projects.
+
+[slide:lemonodor fame]
+
+I do miss the feeling that everyone was sort of tuned in to the same
+information. If you wanted people to know about your project, you
+would just email lemonodor.
+
+Now there sources of information all over the place, from reddit, to
+linkedin -- yes, seriously, linkedin has an Common Lisp discussion
+group -- to twitter, to lispforum.com, and elsewhere. People aren't
+blogging like they used to, or using IRC, or posting to Usenet, but
+new stuff is complementing the old.
+
+Sometimes I want to be able to reach out to all Common Lisp users and
+the method today is posting to half a dozen websites and a dozen
+mailing lists. I would love to see something arise that's more of a
+central Common Lisp grapevine. Maybe someone here today will start it.
+
+If you have something interesting to say about Common Lisp, get
+yourself a blog and start saying it!
+
+[slide:Getting help]
+
+Let's talk about trends in getting help.
+
+[slide:usenet]
+
+First, usenet.
+
+I still use usenet and read comp.lang.lisp every day. There are still
+people there with a wealth of experience and a desire to share. 
+
+[slide: Usenet no helpful]
+
+Unfortunately, compared to almost anything else, it's really difficult
+to use. I get by because I've been using GNUS and a killfile for
+years. If you use Google Groups, the posts get mangled and look
+terrible. There are many trolls and confused people posting all at
+once.
+
+I can't imagine someone starting fresh today and trying to sort out
+the good information from the garbage on usenet. 
+
+
+
+[slide:overflow]
+
+Here's a graph of Stack Overflow questions per year that are tagged as
+related to Common Lisp. (I've projected 2015 out based on the stats for
+the first three months.)
+
+I think this is an encouraging sign. I watch Stack Overflow's Common
+Lisp questions with its RSS feed, and there's a good mix of homework
+questions, questions from people learning Common Lisp on their own,
+and experienced users stuck on a particular problem.
+
+What's especially encouraging is that there are number of experts who
+take the time to answer almost every question. The answers are very
+prompt, and usually of high quality. Bad answers get filtered
+out. Unclear answers are quickly clarified by feedback from others.
+
+I don't know how good or bad Stack Overflow is for other programming
+languages, but for Common Lisp, more and more people are using it for
+their questions and getting good results.
+
+It's a good place for newcomers to turn when they need help.
+
+
+[slide:cl implementations]
+
+Let's take a look at the state of Common Lisp implementations.
+
+In 2010, Dan Weinreb conducted a survey of 11 Common Lisp
+implementations.
+
+https://common-lisp.net/~dlw/LispSurvey.html 
+
+Of the eleven implementations in Dan's survey, all but three have had
+releases since 2010. GNU CLISP and Scieneer aren't dead, they work
+fine, and are supported by Quicklisp, they just haven't had released
+updates in quite a long time.
+
+The only real casualty of Dan's original survey is Corman CL. All
+other implementations are under more or less active
+development. Even GNU CL, which was not updated for many years, has
+seen new development activity in the past 12 months.
+
+Corman Lisp has the potential for new life with a new license.
+
+[slide: new lisps]
+
+There are multiple new CL implementations. Some are quite specialized,
+like Mezzano for an OS project, and Clasp for C++ interop. Some are
+old codebases newly licensed, like Corman Lisp and Eclipse Common
+Lisp. But they've all had some interesting new activity in the past
+few years.
+
+And I've heard there's at least one more older, special-purpose CL in
+the pipeline that may come out under a new license in the near future.
+
+
+[slide:People like Quicklisp]
+
+One final anecdotal trend. I don't have any numbers on this, but my
+impression is that people like Quicklisp.
+
+In the past few years I've heard about many Common Lisp projects,
+sometimes hobby projects, sometimes commercial products or services,
+sometimes as behind the scenes infrastructure to help out one person
+at a job, and the majority of them use Quicklisp in one form or
+another to help save some work, and build on the work of others, to
+get things done.
+
+There are about a dozen people, and a couple companies, who donate
+some money to Quicklisp every month.
+
+I've heard from more than a few people who have told me Quicklisp has
+tipped the balance in favor of using Common Lisp for a project, both
+for personal projects and commercial projects.
+
+By pushing Quicklisp beyond beta, I hope to continue that trend.
+
+[Beyond Beta]
+
+When I first released Quicklisp, I felt it would be pretty useful. It
+did meet some of my goals, like being easy to install and use, and
+working everywhere.
+
+Over time it's met more of my goals, like keeping a permanent copy of
+all its versions, so it's possible to go back to a previous version,
+even back to the first version from 2010.
+
+So why do I still call it "beta"?
+
+This might not be standard usage of the term, but for me, "beta" means
+"almost finished, but not quite." I felt that way in 2010, and even
+though it's closer to "almost finished" today in 2015, there are still
+some "not quites."
+
+By finishing a few things, I hope to be able to say, "here it is, this
+is what I had in mind."
+
+[slide: What is quicklisp supposed to be?]
+
+Earlier I described some aspects of Quicklisp. It's easy to install,
+easy to use, and makes it easy to use and update a bunch of libraries.
+
+[slide: Make it easy to confidently]
+
+But at a higher level, I'd say that Quicklisp aims to be a make it
+easy to confidently build on the work of others.
+
+[slide: work everywhere]
+
+Oh, and it should work everywhere. I couldn't figure out how to work
+that into the first slogan.
+
+But anyway, how well is it doing what it's supposed to do?
+
+[slide: Easy]
+
+Quicklisp has some aspects that are already easy. It's easy to
+install. If you stick to a couple well-known commands, it's easy to
+use, and update.
+
+But, it *should* be easy to use *all* available commands.
+
+It *should* be easy to find libraries that might help you. It's no
+good if there's a library that does what you need, but you can't find
+it.
+
+It *should* be easy to estimate if a library is worth trying. That
+means getting easy access to some abstract information, like how
+popular a library is, or how actively it's developed. It can also mean
+seeing feedback from other people with their experiences, for example:
+"This library is incomplete," or "This library is perfect."
+
+Even with that that information, a library you find might ultimately
+not suit your needs. That can happen. But a first step is to make it
+easy to find a library and to share as much useful information about
+it as possible.
+
+[slide: Confident]
+
+Quicklisp can already be used with some confidence.
+
+[bullet]
+There is a relatively low risk in trying new and updated
+things. It's possible, if there's any problem, to go back to a
+previous version.
+
+[bullet]
+It's possible to lock in to a specific library configuration and
+build on it without worrying about something changing behind your
+back.
+
+[bullet]
+
+It *should* be easy to find out where a piece of software came from,
+and how to get it directly from its source.
+
+[bullet]
+
+When using Quicklisp, you *should* be able to learn to know what to
+expect. Nobody likes surprises.
+
+
+[slide: Build on the work of others]
+
+[bullet]
+
+Building on reusable libraries is the most obvious use of
+Quicklisp. It works pretty well at that.
+
+[bullet]
+
+But it should also be easy to build on Quicklisp itself. It's designed
+with internal protocols and hooks and data formats that are meant to
+make it easy to extend and customize to your own needs.
+
+[bullet]
+
+It should also be easy to find out if any of the projects you use have
+licensing terms that are incompatible with your own.
+
+
+[slide: Closing the gap: four categories]
+
+With the purpose of Quicklisp in mind, "make it easy to confidently
+build on the work of others," here are the things I think are
+necessary to fulfill that purpose and move beyond beta.
+
+[bullet]
+
+Documentation is needed to be able make full use of the features of
+Quicklisp, both the features it already has, and the features to be
+added.
+
+[bullet]
+
+And there are a number of features to be added, things that Quicklisp
+doesn't do, but should. This feature list is somewhat arbitrary, but
+there are a few key things that I've had in mind from the start.
+
+[bullet]
+
+There's a need to collect and provide more metadata in an accessible
+way. Information like where a library came from, and what its license
+is, and a short description, should be available with a few simple
+functions. You shouldn't have to resort to a Google search to get it.
+
+[bullet]
+
+And finally there's a need for improved library discovery and
+feedback. It doesn't matter if someone has written a wonderful library
+that does exactly what you need if you can't find it.
+
+[slide: Documentation]
+
+Documentation is essential to make full use of Quicklisp. Yes, it's
+possible to get a lot done with just a couple commands. But
+documentation can make you aware of new possibilities, and set the
+right expectations for what Quicklisp can do for you. Useful features
+shouldn't be documented only by word of mouth.
+
+[slide: User documentation]
+
+There are two levels of documentation needed. First, there's user
+documentation.
+
+That means that the commands that are built-in to Quicklisp are
+described, and their features and quirks and limitations are presented
+clearly.
+
+[slide: where-is-system]
+
+As an example, there's a diagnostic command built in to Quicklisp
+called where-is-system. Given a system name, it returns the pathname
+in which that system is defined.
+
+It's very simple, and just just a thin wrapper around a couple ASDF
+commands. But I use it all the time when providing tech support for
+Quicklisp problems.
+
+[slide: where-is-system output]
+
+If there's a system that isn't building for some reason, I ask to see
+the where-is-system output. It turns out that the pathname alone gives
+a strong clue about where the system comes from.
+
+There are certain pathname patterns that indicate broken debian
+packaging,
+
+[bullet]
+
+or ancient asdf-install artifacts,
+
+[bullet]
+
+and where-is-system can help identify those problems immediately.
+
+But it's not documented, and it should be. Everyone else could use
+this command to save time when troubleshooting.
+
+[slide: Local projects]
+
+[bullet]
+
+As another example, I use the local-projects feature all the time. In
+case you didn't know, any time you put a new file or directory into
+the quicklisp local-projects directory, it automatically gets scanned
+for system files, and those systems are then automatically loadable
+with ASDF. There isn't anything to configure, it works behind the
+scenes by checking filesystem timestamps and updating its indexes as
+needed.
+
+[bullet]
+
+This system is controlled by a special variable called
+*local-project-directories*. By default, that includes a single
+directory, but you can push things onto it to scan elsewhere.
+
+Sometimes the timestamp system doesn't work. That can happen if you
+add things at a deeper directory level. 
+
+[bullet]
+
+When it doesn't work, there's a simple command to manually update
+things called register-local-projects.
+
+[bullet]
+
+I use this feature, without thinking about it, all the time. I wrote
+about it a little bit on the Quicklisp blog in 2011. It's mentioned in
+some README files.
+
+Everyone could potentially benefit from using it. But it's not
+sufficiently documented.
+
+
+
+[slide: Many, many more]
+
+These are just a couple examples of user tools that are
+underused. There are more than 30 user commands in Quicklisp, and only
+a couple are documented.
+
+[slide: Not just commands]
+
+And it's not just commands. Quicklisp has a flexible initialization
+sequence, so you can customize Quicklisp as it starts up. The entire
+Quicklisp directory can be moved around, by design. It doesn't need to
+be installed multiple times for multiple implementations.
+
+This kind of behavior can be extremely useful, but since it's not
+documented, most people can't easily take advantage of it.
+
+I want to fix that.
+
+[slide: Developer documentation]
+
+Those are some things that need to be documented for users to get the
+most out of Quicklisp and build on the libraries it provides.
+
+But Quicklisp itself is potentially extensible. It's designed with
+that in mind. To fulfill that potential, it needs developer
+documentation.
+
+[slide]
+
+When it comes to developer documentation, I'm talking about a few
+related things.
+
+
+
+[slide: Data model]
+
+Quicklisp is driven by a very simple data model. It's a hierarchy of
+containers.
+
+At the top is the dist, which represents the state of an entire set of
+libraries.
+
+The dist contains a number of release objects, which represent the
+state of a particular project at a particular point in time.
+
+And each release contains one or more systems.
+
+[slide: Data model specifics]
+
+For example, here's the hierarchy for one version of one library,
+vecto.
+
+[slide: Protocols and hooks]
+
+There are a few dozen generic functions related to working with the
+data model. Here aresome examples. I think some of these names are
+self-explanatory.
+
+You can install, uninstall, enable, disable certain objects.
+
+You can query certain objects for their contents.
+
+You can stop dists from updating themselves.
+
+You can get a list of all available dists.
+
+There's a special variable that controls what's returned for the list
+of all dists.
+
+The goal of the protocols is to make it possible to adapt Quicklisp to
+new purposes without rewriting everything from scratch.
+
+[slide: Metadata format]
+
+The metadata file that describes dists is very simple, it's just a
+file full of space-separated values.
+
+By documenting it, it becomes possible to make your own dists,
+following your own policies, and use them instead of the standard
+Quicklisp dist. You could produce a dist of software with licensing
+that you prefer, or that excludes all software that doesn't work on a
+particular platform. It could even host private, internal libraries on
+an internal server. There are a lot of potential uses.
+
+[slide: Why Developer Documentation?]
+
+The point of documenting these related things is to make it possible
+for people to make variations and adaptations without having to read
+all the code. And even if you read the code, there's no way to tell if
+some piece of code's behavior is by design, or accidental, and whether
+it's safe to rely on it. And it's hard to get a big-picture idea of
+how things are meant to work togther.
+
+Developer documentation isn't magic. It won't write any code on its
+own. But it does make it easier for anyone who *does* write the
+code. It makes it possible to build something without starting
+completely from scratch.
+
+You're not just building on libraries. You're building on Quicklisp
+itself.
+
+[slide: Missing Features]
+
+There are a lot of features that could be added to Quicklisp. There
+are only a couple left, though, that I've had in mind from the start,
+and that I want to add to go beyond beta.
+
+[bullet]
+The first is improving how Quicklisp fetches software. Right now it
+can only fetch software that's available via HTTP.
+
+I want to make it easy to hook into the fetch process to support more
+ways to get software.
+
+One easy option is to support copying from local files.
+
+A harder, but very useful option is to support secure HTTP
+connections.
+
+In addition to supporting more protcols, it should also be possible to
+hook into the whole process and manipulate or even cancel the
+request. For example, it could be used to turn off network access if
+that's needed. Or it could be used to set up and use local mirroring
+or caching.
+
+[bullet]
+Bundling libraries means taking a set of libraries out of Quicklisp,
+and producing a directory tree of code that can be used even if
+Quicklisp isn't there.
+
+I think it could be useful to set up stable sets of libraries, outside
+of Quicklisp, that match your needs, and avoid Quicklisp's complexity
+in places where it's not needed.
+
+[slide: bundle-systems example]
+
+Here's an example of how bundle-systems works.
+
+There's some good news: the bundling feature is in Quicklisp right
+now. I was able to work on it last week. If you use update-client,
+you'll get a new version that supports the bundle-systems
+command. It's even documented, and I'll post a link to the
+documentation later.
+
+
+
+[slide: Available now!]
+
+[slide: Metadata]
+
+Metadata, in this context, is information about systems and
+releases. There's a lot of information available about systems and
+projects that's scattered in a lot of different places.
+
+Some of that information is so useful that it should be much easier to
+access.
+
+[bullet: descriptive system info]
+
+For example, I use system-apropos a
+lot, but that's mostly good if you already know part of the
+name. Descriptive system info, and the ability to search it from the
+REPL, will be a big improvement.
+
+[bullet: License info]
+
+It should be possible to use functions to determine license info for a
+project or system. It's pretty important, when building a new project,
+to be aware of any licensing issues with the libraries you're building
+on.
+
+[bullet: provenance info]
+
+Provenance information is to make it possible to get back to the
+source, or at least have a very good idea about the source.
+
+clbuild is one of the motivators for this feature.
+
+Right now, libraries in Quicklisp are, by design, black boxes, or
+building blocks, to build your project. You're not working on fixing
+or adding features to libraries, you're working on your own project.
+
+That's great, when it works.
+
+Sometimes a library has is missing something and you don't mind adding
+it. Or it has a bug and you don't mind fixing it.
+
+When you actually *want* to help out and hack on the libraries you're
+using, you'll find that the code Quicklisp provides is a snapshot,
+frozen in time, and not something really suitable for development.
+
+*Without* provenance info, a google search might work, or it might
+lead you to an old version of the project, or the wrong fork or
+branch, or possibly to nothing at all.
+
+*With* provenance info, you can, in many cases, find the source
+control system of the project, hack on the, and hopefully make it
+better.
+
+[bullet]
+
+And if the provenance info is easy enough to query, you could
+potentially have some short commands, like hack-on-system, that
+quickly get you up and running when you want to hack on library
+infrastructure.
+
+
+[slide: Discovery and Feedback]
+
+Discovery and feedback are for finding projects that might do what you
+need. It's also for determining if a project is worth trying, or which
+among many projects is worth trying first.
+
+The Quickdocs project works well for many aspects of this. It provides
+a consistent view of all the projects in Quicklisp, drawing info from
+the project's readme file, code, and other metadata.
+
+It has a simple search system.
+
+I'd like to see something that builds on that idea, and provides extra
+information, such as relative popularity, development activity, github
+watcher count, and related data.
+
+I'd also like to see something that accepts user feedback. Very
+approximately like an Amazon product page, where there is rating and
+review information. Getting feedback from someone who as actually used
+a project can be very helpful in determining whether to use a project
+yourself.
+
+Each element isn't particularly complicated by itself, but it does
+take time to get everything integrated: gathering the info, making it
+searchable, accepting feedback, and presenting it all in a useful way.
+
+
+
+[slide: Roadmap]
+
+So here's a broad roadmap. Documentation, features, metadata, and
+discovery and feedback.
+
+They're not in a particular order. Sometimes opportunity arises, like
+with the bundling feature, and things get done more quickly.
+
+[slide: Timeline]
+
+I don't have a fixed timeline for implementing my goals for going
+beyond beta. My employer, Clozure Associates, has been very supportive
+of my work on Quicklisp, but it's not the only thing I work on.
+
+If someone wants to sponsor a particular feature, or implement it
+themselves, please talk to me and we can figure it out.
+
+[slide: Thank you]
+
+There you have it. I hope you've learned a bit about the past five
+years of Quicklisp and Common lisp, and a bit about where Quicklisp is
+heading.
+
+I want to thank everyone who has given me feedback, ideas, and patches
+for Quicklisp.
+
+I want to thank everyone who has worked on Common Lisp
+implementations. They're all amazing projects. We are very lucky to
+have so many options and choices.
+
+I want to thank everyone who has written and shared libraries for
+Common Lisp. Libraries are everything to Quicklisp.
+
+Let's keep building on each others' work and make great things with
+Common Lisp.
+
+Thank you for listening!
+
+[slide: Questions?]
+
+Questions?
+
+
