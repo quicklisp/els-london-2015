@@ -18,6 +18,10 @@ Of the Common Lisp users, who here has *never* used Quicklisp?
 
 Ok. Thanks. That's about what I expected.
 
+[ed note: I decided against the above line before giving the talk, but
+left it in the script. As it turned out, there were more non-Quicklisp
+users than I expected, anyway. Too smug by half!]
+
 
 [slide: my perspective]
 
